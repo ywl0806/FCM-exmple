@@ -1,79 +1,125 @@
-import { Button, Fade } from "@mui/material";
-import axios from "axios";
-import { getMessaging, Messaging } from "firebase/messaging";
+import {
+  Avatar,
+  Collapse,
+  IconButton,
+  List,
+  ListItem,
+  Typography,
+} from "@mui/material";
+import { getMessaging } from "firebase/messaging";
 import { useState, useEffect } from "react";
-import { onMessageListener, requestForToken } from "./firebaseInit";
+import { DevicePermissionSafe } from "./deviceSafe";
+import { onMessageListener } from "./firebaseInit";
 import { subscription } from "./functions";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { TransitionGroup } from "react-transition-group";
+import { NoticeDataType } from "./types/notice";
+import noticeBroadcast, {
+  deleteMessage,
+  getMessages,
+  gettingIt,
+  saveMessages,
+} from "./broadcast";
 
-interface NoticeDataType {
-  id: string;
-  title: string;
-  body: string;
-  imgUrl?: string;
+interface Props {
+  count: number;
+  setCount: React.Dispatch<React.SetStateAction<number>>;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-export const Notification = () => {
+export const Notification = ({ count, setCount, setOpen }: Props) => {
   const [noticeList, setNoticeList] = useState<NoticeDataType[]>([]);
-  const [arrive, setArrive] = useState(false);
   const messaging = getMessaging();
-
-  onMessageListener(messaging)
-    .then((payload) => {
-      setArrive(true);
-
-      const arrivedNotice: NoticeDataType = {
-        id: payload.messageId,
-        title: payload.data?.title ?? "",
-        body: payload.data?.body ?? "",
-        imgUrl: payload.data?.imgUrl ?? "",
-      };
-
-      const list = [...noticeList];
-
-      list.push(arrivedNotice);
-
-      setNoticeList(list);
-    })
-    .catch((err) => console.log("failed: ", err));
 
   const deleteNotice = (key: string) => {
     const list = noticeList.filter((not) => key !== not.id);
     setNoticeList(list);
+    deleteMessage(key);
+    if (list.length === 0) setOpen(false);
+  };
+
+  noticeBroadcast.onmessage = (e) => {
+    const datas: NoticeDataType[] = e.data;
+
+    if (datas.length === 0) return;
+
+    const newlist = [...noticeList, ...datas];
+    setCount(count + datas.length);
+    setNoticeList(newlist);
+    saveMessages(newlist);
   };
   useEffect(() => {
+    onMessageListener(messaging)
+      .then((payload) => {
+        const arrivedNotice: NoticeDataType = {
+          id: payload.messageId,
+          title: payload.data?.title ?? "",
+          body: payload.data?.body ?? "",
+          imgUrl: payload.data?.imgUrl ?? "",
+        };
+
+        const list = [...noticeList];
+
+        list.push(arrivedNotice);
+        setCount((count) => count + 1);
+        setNoticeList(list);
+        saveMessages(list);
+      })
+      .catch((err) => console.log("failed: ", err));
+  }, [noticeList]);
+  gettingIt();
+  useEffect(() => {
+    window.addEventListener("focus", () => {
+      gettingIt();
+    });
+    const savedList = getMessages();
+    setNoticeList(savedList);
     subscription(messaging);
   }, []);
   return (
-    <div>
-      {noticeList.map((notice) => {
-        return (
-          <Fade key={notice.id} in={arrive}>
-            <div
-              className={`text-center mx-auto bg-slate-100  w-[23rem] rounded-3xl
-							shadow-lg border-2 p-[1.2rem] my-[0.5rem]`}
-            >
-              <h1 className="text-2xl font-bold text-left text-[#00ADB5]">
-                {notice.title}
-              </h1>
-              <p className="mt-[1rem] text-1xl">{notice.body}</p>
-              {notice.imgUrl ? (
-                <img width={50} height={50} src={notice.imgUrl} />
-              ) : (
-                <></>
-              )}
-              <div className="text-right">
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={() => deleteNotice(notice.id)}
-                >
-                  x
-                </Button>
-              </div>
-            </div>
-          </Fade>
-        );
-      })}
-    </div>
+    <DevicePermissionSafe>
+      <div className="max-h-[50rem] overflow-scroll rounded-3xl border-[0.2rem] border-gray-500 bg-[#222831] pb-[2rem] pt-[1rem] text-white">
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          component="div"
+          className=" pl-[2rem] pt-[1rem] text-white"
+        >
+          NOTICE
+        </Typography>
+        <List>
+          <TransitionGroup>
+            {noticeList.map(({ id, title, body, imgUrl }) => (
+              <Collapse key={id}>
+                <ListItem className="my-[-0.5rem]">
+                  <div className="mt-[0.6rem] w-full rounded-3xl bg-slate-600 p-[1rem] ">
+                    <div className="flex justify-between">
+                      <Avatar
+                        src={imgUrl}
+                        className="my-auto  bg-slate-600"
+                        sx={{ width: 56, height: 56 }}
+                      />
+                      <div className="ml-[2rem] flex-grow whitespace-pre-wrap break-all text-left">
+                        <h1 className="text-[1.3rem] text-white">{title}</h1>
+                        <p className="w-full text-[1.1rem] text-gray-400">
+                          {body}
+                        </p>
+                      </div>
+                      <IconButton
+                        onClick={() => deleteNotice(id)}
+                        className="my-auto h-10 w-10 opacity-20 transition-opacity duration-500 ease-out hover:opacity-100"
+                        color="error"
+                        edge="start"
+                      >
+                        <DeleteIcon color="error" />
+                      </IconButton>
+                    </div>
+                  </div>
+                </ListItem>
+              </Collapse>
+            ))}
+          </TransitionGroup>
+        </List>
+      </div>
+    </DevicePermissionSafe>
   );
 };

@@ -9,16 +9,17 @@ export const DevicePermissionSafe = ({ children }: Props) => {
   const [permission, setPermission] = useState(false);
 
   const reqPermission = () => {
-    Notification.requestPermission();
-    setPermission(true);
+    Notification.requestPermission().then((result) => {
+      if (result === "granted") setPermission(true);
+    });
   };
   useEffect(() => {
     if (Notification.permission === "granted") setPermission(true);
   }, []);
   if (/iPhone|iPad|iPod/.test(navigator.userAgent) || !permission)
     return (
-      <div className="flex align-middle justify-center">
-        <div className="h-[10rem] bg-slate-400 text-center w-[20rem] flex justify-center align-middle p-10">
+      <div className="flex justify-center align-middle">
+        <div className="flex h-[10rem] w-[20rem] justify-center bg-slate-400 p-10 text-center align-middle">
           <Button
             variant="contained"
             className="h-[5rem]"

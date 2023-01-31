@@ -1,6 +1,5 @@
 import { initializeApp } from "firebase/app";
 import {
-  getMessaging,
   getToken,
   MessagePayload,
   Messaging,

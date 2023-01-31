@@ -16,7 +16,16 @@ const config = {
 };
 
 firebase.initializeApp(config);
+let messages = [];
 
+const braodcast = new BroadcastChannel("ch-notice");
+
+braodcast.onmessage = (event) => {
+  if (event.data.type === "getMessages") {
+    braodcast.postMessage(messages);
+    messages = [];
+  }
+};
 const isSupported = firebase.messaging.isSupported();
 if (isSupported) {
   const messaging = firebase.messaging();
@@ -24,17 +33,20 @@ if (isSupported) {
     // Customize notification here
     const notificationTitle = payload.data.title;
     const notificationOptions = {
+      data: payload.data,
       body: payload.data.body,
-      icon: "/pepe.png",
+      icon: "/doge.jpg",
     };
 
+    messages.push({ ...payload.data, id: payload.messageId });
+    if (messages.length > 10) {
+      messages.shift();
+    }
     self.registration.showNotification(notificationTitle, notificationOptions);
   });
 
   self.addEventListener("notificationclick", (e) => {
     e.notification.close();
-    console.log(e);
-
     e.waitUntil(
       clients
         .matchAll({ includeUncontrolled: true, type: "window" })
@@ -45,7 +57,9 @@ if (isSupported) {
             if ("focus" in client) return client.focus();
           }
 
-          if (clients.openWindow) return clients.openWindow("/");
+          if (clients.openWindow) {
+            return clients.openWindow("/");
+          }
         })
     );
   });
