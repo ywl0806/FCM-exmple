@@ -31,36 +31,36 @@ if (isSupported) {
   const messaging = firebase.messaging();
   messaging.onBackgroundMessage((payload) => {
     // Customize notification here
-    const notificationTitle = payload.data.title;
-    const notificationOptions = {
-      data: payload.data,
-      body: payload.data.body,
-      icon: "/doge.jpg",
-    };
-
+    // const notificationTitle = payload.data.title;
+    // const notificationOptions = {
+    //   data: payload.data,
+    //   body: payload.data.body,
+    //   icon: "/doge.jpg",
+    // };
+    // self.registration.showNotification(notificationTitle, notificationOptions);
+    console.log(payload);
     messages.push({ ...payload.data, id: payload.messageId });
     if (messages.length > 10) {
       messages.shift();
     }
-    self.registration.showNotification(notificationTitle, notificationOptions);
   });
 
-  self.addEventListener("notificationclick", (e) => {
-    e.notification.close();
-    e.waitUntil(
-      clients
-        .matchAll({ includeUncontrolled: true, type: "window" })
-        .then((clientList) => {
-          for (let i = 0; i < clientList.length; i++) {
-            const client = clientList[i];
+  // self.addEventListener("notificationclick", (e) => {
+  //   e.notification.close();
+  //   e.waitUntil(
+  //     clients
+  //       .matchAll({ includeUncontrolled: true, type: "window" })
+  //       .then((clientList) => {
+  //         for (let i = 0; i < clientList.length; i++) {
+  //           const client = clientList[i];
 
-            if ("focus" in client) return client.focus();
-          }
+  //           if ("focus" in client) return client.focus();
+  //         }
 
-          if (clients.openWindow) {
-            return clients.openWindow("/");
-          }
-        })
-    );
-  });
+  //         if (clients.openWindow) {
+  //           return clients.openWindow("/");
+  //         }
+  //       })
+  //   );
+  // });
 }

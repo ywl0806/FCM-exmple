@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import {
+  getMessaging,
   getToken,
   MessagePayload,
   Messaging,
@@ -17,16 +18,16 @@ const firebaseConfig = {
 
 export const initFirebase = () => initializeApp(firebaseConfig);
 
-export const requestForToken = (messaging: Messaging) => {
-  return getToken(messaging, {
+export const requestForToken = () => {
+  return getToken(getMessaging(), {
     vapidKey:
       "BJej2Bbpqr36hDd-QY0pzTBF7Sm2M5n9rdF4y_Qec4r2YSu1BGHkOwPpPti225nZSJQUYCkP0vIxfcWvoaY4WEA",
   });
 };
 
-export const onMessageListener = (messaging: Messaging) =>
+export const onMessageListener = () =>
   new Promise<MessagePayload>((resolve) => {
-    onMessage(messaging, (payload) => {
+    onMessage(getMessaging(), (payload) => {
       resolve(payload);
     });
   });

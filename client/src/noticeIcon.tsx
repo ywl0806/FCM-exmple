@@ -35,21 +35,27 @@ export const NoticeIcon = ({
         }}
       >
         <StyledBadge color="error" badgeContent={count}>
+          {count !== 0 ? (
+            <NotificationsIcon
+              fontSize="large"
+              className="absolute top-1 left-1 min-h-[2.5rem] min-w-[2.5rem] animate-ping text-white opacity-70"
+            />
+          ) : (
+            <></>
+          )}
           <NotificationsIcon
             fontSize="large"
             className="min-h-[3rem] min-w-[3rem] text-white"
           />
         </StyledBadge>
       </IconButton>
-      <div className={`absolute ${position} flex justify-end`}>
-        <Collapse in={noticeOpen} translate="yes">
-          <div className="w-[35rem]">
-            <Notification
-              count={count}
-              setCount={setCount}
-              setOpen={setNoticeOpen}
-            />
-          </div>
+      <div className={`absolute ${position} z-10 flex justify-end`}>
+        <Collapse in={noticeOpen} translate="yes" className="w-[35rem]">
+          <Notification
+            count={count}
+            setCount={setCount}
+            setOpen={setNoticeOpen}
+          />
         </Collapse>
       </div>
     </div>

@@ -6,7 +6,7 @@ import {
   ListItem,
   Typography,
 } from "@mui/material";
-import { getMessaging } from "firebase/messaging";
+import { getMessaging, onMessage } from "firebase/messaging";
 import { useState, useEffect } from "react";
 import { DevicePermissionSafe } from "./deviceSafe";
 import { onMessageListener } from "./firebaseInit";
@@ -28,13 +28,15 @@ interface Props {
 }
 export const Notification = ({ count, setCount, setOpen }: Props) => {
   const [noticeList, setNoticeList] = useState<NoticeDataType[]>([]);
-  const messaging = getMessaging();
 
   const deleteNotice = (key: string) => {
     const list = noticeList.filter((not) => key !== not.id);
     setNoticeList(list);
     deleteMessage(key);
-    if (list.length === 0) setOpen(false);
+    if (list.length === 0) {
+      setCount(0);
+      setOpen(false);
+    }
   };
 
   noticeBroadcast.onmessage = (e) => {
@@ -47,8 +49,9 @@ export const Notification = ({ count, setCount, setOpen }: Props) => {
     setNoticeList(newlist);
     saveMessages(newlist);
   };
+
   useEffect(() => {
-    onMessageListener(messaging)
+    onMessageListener()
       .then((payload) => {
         const arrivedNotice: NoticeDataType = {
           id: payload.messageId,
@@ -56,9 +59,7 @@ export const Notification = ({ count, setCount, setOpen }: Props) => {
           body: payload.data?.body ?? "",
           imgUrl: payload.data?.imgUrl ?? "",
         };
-
         const list = [...noticeList];
-
         list.push(arrivedNotice);
         setCount((count) => count + 1);
         setNoticeList(list);
@@ -73,11 +74,11 @@ export const Notification = ({ count, setCount, setOpen }: Props) => {
     });
     const savedList = getMessages();
     setNoticeList(savedList);
-    subscription(messaging);
+    subscription();
   }, []);
   return (
     <DevicePermissionSafe>
-      <div className="max-h-[50rem] overflow-scroll rounded-3xl border-[0.2rem] border-gray-500 bg-[#222831] pb-[2rem] pt-[1rem] text-white">
+      <div className="max-h-[30rem] overflow-auto rounded-3xl border-[0.2rem] border-gray-500 bg-[#222831] pb-[2rem] pt-[1rem] text-white">
         <Typography
           variant="h5"
           fontWeight="bold"
@@ -90,7 +91,7 @@ export const Notification = ({ count, setCount, setOpen }: Props) => {
           <TransitionGroup>
             {noticeList.map(({ id, title, body, imgUrl }) => (
               <Collapse key={id}>
-                <ListItem className="my-[-0.5rem]">
+                <ListItem className="my-[-0.5rem] ">
                   <div className="mt-[0.6rem] w-full rounded-3xl bg-slate-600 p-[1rem] ">
                     <div className="flex justify-between">
                       <Avatar

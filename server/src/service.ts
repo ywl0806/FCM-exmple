@@ -11,18 +11,35 @@ export const subscribe = async (req: Request, res: Response) => {
   res.send();
 };
 
-interface MessageType {
+interface AnyType {
+  [key: string]: any;
+}
+interface MessageType extends AnyType {
   title: string;
   body: string;
-  imageUrl: string;
+  imageUrl?: string;
+  icon?: string;
+  badge?: string;
 }
 export const sendMessage = async (req: Request, res: Response) => {
-  const { title, body, imageUrl, ...rest }: MessageType = req.body ?? {};
+  const { title, body, imageUrl, icon, badge, ...rest }: MessageType =
+    req.body ?? {};
 
   try {
     const result = await messaging().sendMulticast({
+      notification: { title, body, imageUrl },
       data: { title, body, imageUrl: imageUrl ?? "", ...rest },
       tokens: [...users.values()],
+      webpush: {
+        notification: {
+          title,
+          body,
+          icon: icon ?? "/pepe.png",
+          badge: badge ?? "/doge.jpg",
+          actions: [{ action: "/hoge", title: "title" }],
+        },
+        fcmOptions: { link: "/" },
+      },
     });
     console.log("🚀 / result / result", result);
     res.send(result);
