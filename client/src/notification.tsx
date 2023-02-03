@@ -78,49 +78,42 @@ export const Notification = ({ count, setCount, setOpen }: Props) => {
   }, []);
   return (
     <DevicePermissionSafe>
-      <div className="max-h-[30rem] overflow-auto rounded-3xl border-[0.2rem] border-gray-500 bg-[#222831] pb-[2rem] pt-[1rem] text-white">
-        <Typography
-          variant="h5"
-          fontWeight="bold"
-          component="div"
-          className=" pl-[2rem] pt-[1rem] text-white"
-        >
-          NOTICE
-        </Typography>
-        <List>
-          <TransitionGroup>
-            {noticeList.map(({ id, title, body, imgUrl }) => (
-              <Collapse key={id}>
-                <ListItem className="my-[-0.5rem] ">
-                  <div className="mt-[0.6rem] w-full rounded-3xl bg-slate-600 p-[1rem] ">
-                    <div className="flex justify-between">
-                      <Avatar
-                        src={imgUrl}
-                        className="my-auto  bg-slate-600"
-                        sx={{ width: 56, height: 56 }}
-                      />
-                      <div className="ml-[2rem] flex-grow whitespace-pre-wrap break-all text-left">
-                        <h1 className="text-[1.3rem] text-white">{title}</h1>
-                        <p className="w-full text-[1.1rem] text-gray-400">
-                          {body}
-                        </p>
-                      </div>
-                      <IconButton
-                        onClick={() => deleteNotice(id)}
-                        className="my-auto h-10 w-10 opacity-20 transition-opacity duration-500 ease-out hover:opacity-100"
-                        color="error"
-                        edge="start"
-                      >
-                        <DeleteIcon color="error" />
-                      </IconButton>
+      <h1 className=" pl-[2rem] pt-[1rem] text-[1.5rem] font-bold text-white md:text-[2rem]">
+        NOTICE
+      </h1>
+      <List>
+        <TransitionGroup>
+          {noticeList.map(({ id, title, body, imgUrl }) => (
+            <Collapse key={id}>
+              <ListItem className="my-[-0.5rem] ">
+                <div className="mt-[0.6rem] w-full rounded-3xl bg-slate-600 p-[1rem] ">
+                  <div className="flex justify-between">
+                    <Avatar
+                      src={imgUrl}
+                      className="my-auto  bg-slate-600"
+                      sx={{ width: 56, height: 56 }}
+                    />
+                    <div className="ml-[2rem] flex-grow whitespace-pre-wrap break-all text-left">
+                      <h1 className="text-[1.3rem] text-white">{title}</h1>
+                      <p className="w-full text-[1.1rem] text-gray-400">
+                        {body}
+                      </p>
                     </div>
+                    <IconButton
+                      onClick={() => deleteNotice(id)}
+                      className="my-auto h-10 w-10 opacity-20 transition-opacity duration-500 ease-out hover:opacity-100"
+                      color="error"
+                      edge="start"
+                    >
+                      <DeleteIcon color="error" />
+                    </IconButton>
                   </div>
-                </ListItem>
-              </Collapse>
-            ))}
-          </TransitionGroup>
-        </List>
-      </div>
+                </div>
+              </ListItem>
+            </Collapse>
+          ))}
+        </TransitionGroup>
+      </List>
     </DevicePermissionSafe>
   );
 };

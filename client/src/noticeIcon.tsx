@@ -49,8 +49,12 @@ export const NoticeIcon = ({
           />
         </StyledBadge>
       </IconButton>
-      <div className={`absolute ${position} z-10 flex justify-end`}>
-        <Collapse in={noticeOpen} translate="yes" className="w-[35rem]">
+      <div className={`absolute ${position} z-10 flex w-full justify-end`}>
+        <Collapse
+          in={noticeOpen}
+          translate="yes"
+          className="w-full md:w-[35rem]"
+        >
           <Notification
             count={count}
             setCount={setCount}

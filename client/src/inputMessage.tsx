@@ -1,4 +1,4 @@
-import { Button, FormGroup, Input, InputLabel, TextField } from "@mui/material";
+import { Button, FormGroup, TextField } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
 
@@ -10,7 +10,7 @@ export const InputMessage = () => {
     await axios.post("http://localhost:3030/send-message", { title, body });
   };
   return (
-    <div className="container mx-auto">
+    <div className="container -z-50 mx-auto w-full">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -18,7 +18,7 @@ export const InputMessage = () => {
         }}
       >
         <div className="flex justify-center">
-          <FormGroup className=" mt-[5rem]  w-full rounded-lg bg-white p-[5rem] shadow-2xl md:w-2/3">
+          <FormGroup className=" mt-[5rem]  w-full rounded-lg bg-white p-[2rem] shadow-2xl md:w-2/3 md:p-[5rem] ">
             <TextField
               label={"Title"}
               id="title"
@@ -38,7 +38,7 @@ export const InputMessage = () => {
               }}
             />
             <div className="mt-5 flex justify-center">
-              <Button type="submit" variant="text">
+              <Button type="submit" variant="text" className="">
                 <span className="text-[5rem]">✉️</span>
               </Button>
             </div>

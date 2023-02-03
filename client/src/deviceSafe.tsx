@@ -16,20 +16,23 @@ export const DevicePermissionSafe = ({ children }: Props) => {
   useEffect(() => {
     if (Notification.permission === "granted") setPermission(true);
   }, []);
-  if (/iPhone|iPad|iPod/.test(navigator.userAgent) || !permission)
-    return (
-      <div className="flex justify-center align-middle">
-        <div className="flex h-[10rem] w-[20rem] justify-center bg-slate-400 p-10 text-center align-middle">
+
+  return (
+    <div className="max-h-[30rem] overflow-auto rounded-3xl border-[0.2rem] border-gray-500 bg-[#222831] pb-[2rem] pt-[1rem] text-white">
+      {/iPhone|iPad|iPod/.test(navigator.userAgent) || !permission ? (
+        <div className="flex justify-center pt-3">
           <Button
             variant="contained"
+            color="info"
             className="h-[5rem]"
             onClick={reqPermission}
           >
             <span className="">通知を受信する</span>
           </Button>
         </div>
-      </div>
-    );
-
-  return <>{children}</>;
+      ) : (
+        children
+      )}
+    </div>
+  );
 };
